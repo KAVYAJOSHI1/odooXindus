@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Delivery Orders — ShelfControl</title>
+  <link rel="stylesheet" href="../shared/layout.css"/>
+  <link rel="stylesheet" href="operations.css"/>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-wrap">
+    <header class="topbar" id="topbar"></header>
+    <main class="page-body">
+
+      <div class="page-hdr">
+        <div>
+          <h1 class="page-title">Delivery Orders</h1>
+          <p class="page-sub">Outgoing stock to customers · Validate to decrease stock</p>
+        </div>
+        <div class="page-actions">
+          <div class="status-tabs">
+            <button class="status-tab active" onclick="filterTab(this,'all')">All</button>
+            <button class="status-tab" onclick="filterTab(this,'Draft')">Draft</button>
+            <button class="status-tab" onclick="filterTab(this,'Waiting')">Waiting</button>
+            <button class="status-tab" onclick="filterTab(this,'Ready')">Ready</button>
+            <button class="status-tab" onclick="filterTab(this,'Done')">Done</button>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('createDeliveryModal')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Create Delivery
+          </button>
+        </div>
+      </div>
+
+      <div class="panel" style="animation: fadeUp .35s ease both;">
+        <div class="panel-hdr">
+          <span class="panel-title">Delivery Orders</span>
+          <input type="text" class="form-control" style="height:30px;width:200px;font-size:.78rem;" id="deliverySearch" placeholder="Search…"/>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table" id="deliveriesTable">
+            <thead>
+              <tr>
+                <th>Ref. No.</th>
+                <th>Customer</th>
+                <th>Products</th>
+                <th>Qty</th>
+                <th>From Warehouse</th>
+                <th>Scheduled Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="deliveriesBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- CREATE DELIVERY MODAL -->
+<div class="modal-overlay" id="createDeliveryModal">
+  <div class="modal modal-lg">
+    <div class="modal-hdr">
+      <span class="modal-title">Create Delivery Order</span>
+      <button class="modal-close" onclick="closeModal('createDeliveryModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="workflow-steps">
+        <div class="wf-step active" id="dws1"><div class="wf-step-num">1</div><span class="wf-step-label">Pick Items</span></div>
+        <div class="wf-connector" id="dwc1"></div>
+        <div class="wf-step" id="dws2"><div class="wf-step-num">2</div><span class="wf-step-label">Pack Items</span></div>
+        <div class="wf-connector" id="dwc2"></div>
+        <div class="wf-step" id="dws3"><div class="wf-step-num">3</div><span class="wf-step-label">Validate</span></div>
+      </div>
+
+      <div id="delStep1">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Customer *</label>
+            <input type="text" class="form-control" id="delCustomer" placeholder="Customer name or company"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">From Warehouse</label>
+            <select class="form-control form-select" id="delWarehouse">
+              <option>Main WH</option><option>Warehouse B</option><option>Warehouse C</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Delivery Date</label>
+            <input type="date" class="form-control" id="delDate"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Sales Order Ref.</label>
+            <input type="text" class="form-control" id="delSO" placeholder="e.g. SO-2025-001"/>
+          </div>
+        </div>
+        <div class="product-lines" id="delLines">
+          <div class="product-line product-line-hdr">
+            <span>Product</span><span>Quantity</span><span>Unit</span><span></span>
+          </div>
+        </div>
+        <button class="add-line-btn" onclick="addDeliveryLine()">+ Add Product Line</button>
+      </div>
+
+      <div id="delStep2" style="display:none;">
+        <div style="padding:16px;background:var(--surface-2);border-radius:var(--r-sm);border:1px solid var(--border);">
+          <p style="font-size:.85rem;font-weight:600;margin-bottom:12px;">Packing Checklist</p>
+          <div id="delPackList"></div>
+        </div>
+        <div class="form-group" style="margin-top:14px;">
+          <label class="form-label">Packing Notes</label>
+          <textarea class="form-control" id="delPackNotes" rows="2" placeholder="Box count, special instructions…"></textarea>
+        </div>
+      </div>
+
+      <div id="delStep3" style="display:none;">
+        <div style="text-align:center;padding:20px 0;">
+          <div style="font-size:3rem;margin-bottom:12px;">🚚</div>
+          <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:6px;">Ready to Dispatch</div>
+          <div style="font-size:.82rem;color:var(--text-2);margin-bottom:16px;">Validating will decrease stock for all packed products.</div>
+          <div id="delSummary" style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px;text-align:left;font-size:.82rem;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer" id="delFooter">
+      <button class="btn btn-secondary" onclick="closeModal('createDeliveryModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="delNext()">Next →</button>
+    </div>
+  </div>
+</div>
+
+<script src="../shared/utils.js"></script>
+<script src="operations.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  injectSidebar('deliveries');
+  injectTopbar('Delivery Orders');
+  const dateEl = document.getElementById('delDate');
+  if (dateEl) dateEl.valueAsDate = new Date();
+  addDeliveryLine();
+  renderOpsTable('deliveries');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Receipts — ShelfControl</title>
+  <link rel="stylesheet" href="../shared/layout.css"/>
+  <link rel="stylesheet" href="operations.css"/>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-wrap">
+    <header class="topbar" id="topbar"></header>
+    <main class="page-body">
+
+      <div class="page-hdr">
+        <div>
+          <h1 class="page-title">Receipts</h1>
+          <p class="page-sub">Incoming stock from suppliers · Validate to increase stock</p>
+        </div>
+        <div class="page-actions">
+          <div class="status-tabs">
+            <button class="status-tab active" onclick="filterTab(this,'all')">All</button>
+            <button class="status-tab" onclick="filterTab(this,'Draft')">Draft</button>
+            <button class="status-tab" onclick="filterTab(this,'Waiting')">Waiting</button>
+            <button class="status-tab" onclick="filterTab(this,'Ready')">Ready</button>
+            <button class="status-tab" onclick="filterTab(this,'Done')">Done</button>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('createReceiptModal')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Create Receipt
+          </button>
+        </div>
+      </div>
+
+      <!-- Receipts Table -->
+      <div class="panel" style="animation: fadeUp .35s ease both;">
+        <div class="panel-hdr">
+          <span class="panel-title">Receipts</span>
+          <input type="text" class="form-control" style="height:30px;width:200px;font-size:.78rem;" id="receiptSearch" placeholder="Search by ref, supplier…"/>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table" id="receiptsTable">
+            <thead>
+              <tr>
+                <th>Ref. No.</th>
+                <th>Supplier</th>
+                <th>Products</th>
+                <th>Expected Qty</th>
+                <th>Warehouse</th>
+                <th>Scheduled Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="receiptsBody"></tbody>
+          </table>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-top:1px solid var(--border);">
+          <span style="font-size:.72rem;color:var(--text-3);" id="receiptsCount"></span>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- CREATE RECEIPT MODAL -->
+<div class="modal-overlay" id="createReceiptModal">
+  <div class="modal modal-lg">
+    <div class="modal-hdr">
+      <span class="modal-title">Create Receipt</span>
+      <button class="modal-close" onclick="closeModal('createReceiptModal')">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Workflow steps -->
+      <div class="workflow-steps">
+        <div class="wf-step active" id="ws1"><div class="wf-step-num">1</div><span class="wf-step-label">Supplier & Info</span></div>
+        <div class="wf-connector" id="wc1"></div>
+        <div class="wf-step" id="ws2"><div class="wf-step-num">2</div><span class="wf-step-label">Add Products</span></div>
+        <div class="wf-connector" id="wc2"></div>
+        <div class="wf-step" id="ws3"><div class="wf-step-num">3</div><span class="wf-step-label">Validate</span></div>
+      </div>
+
+      <!-- Step 1 -->
+      <div id="rcpStep1">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Supplier *</label>
+            <select class="form-control form-select" id="rcpSupplier">
+              <option value="">Select supplier</option>
+              <option>MetalCore Ltd</option>
+              <option>WireHub Inc.</option>
+              <option>SafeSeal Co.</option>
+              <option>PackPro Supplies</option>
+              <option>FastBolt International</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Destination Warehouse *</label>
+            <select class="form-control form-select" id="rcpWarehouse">
+              <option>Main WH</option>
+              <option>Warehouse B</option>
+              <option>Warehouse C</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Scheduled Date</label>
+            <input type="date" class="form-control" id="rcpDate"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Purchase Ref. / PO Number</label>
+            <input type="text" class="form-control" id="rcpPO" placeholder="e.g. PO-2025-001"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <textarea class="form-control" id="rcpNotes" rows="2" placeholder="Optional notes…"></textarea>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div id="rcpStep2" style="display:none;">
+        <div class="product-lines" id="rcpLines">
+          <div class="product-line product-line-hdr">
+            <span>Product</span><span>Quantity</span><span>Unit</span><span></span>
+          </div>
+        </div>
+        <button class="add-line-btn" onclick="addReceiptLine()">+ Add Product Line</button>
+      </div>
+
+      <!-- Step 3 -->
+      <div id="rcpStep3" style="display:none;">
+        <div style="text-align:center;padding:20px 0;">
+          <div style="font-size:3rem;margin-bottom:12px;">✅</div>
+          <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin-bottom:6px;">Ready to Validate</div>
+          <div style="font-size:.82rem;color:var(--text-2);margin-bottom:20px;">Validating this receipt will automatically increase stock for all listed products.</div>
+          <div id="rcpSummary" style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px;text-align:left;font-size:.82rem;color:var(--text-2);"></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer" id="rcpFooter">
+      <button class="btn btn-secondary" onclick="closeModal('createReceiptModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="rcpNext()">Next →</button>
+    </div>
+  </div>
+</div>
+
+<script src="../shared/utils.js"></script>
+<script src="operations.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  injectSidebar('receipts');
+  injectTopbar('Receipts');
+  // Set today's date as default
+  const dateEl = document.getElementById('rcpDate');
+  if (dateEl) dateEl.valueAsDate = new Date();
+  renderOpsTable('receipts');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Products — ShelfControl</title>
+  <link rel="stylesheet" href="../shared/layout.css"/>
+  <link rel="stylesheet" href="products.css"/>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-wrap">
+    <header class="topbar" id="topbar"></header>
+    <main class="page-body">
+
+      <div class="page-hdr">
+        <div>
+          <h1 class="page-title">Products</h1>
+          <p class="page-sub">Manage your product catalogue and stock levels</p>
+        </div>
+        <div class="page-actions">
+          <select class="form-control form-select" style="height:34px;width:140px;font-size:.8rem;" id="catFilter">
+            <option value="all">All Categories</option>
+            <option value="Raw Materials">Raw Materials</option>
+            <option value="Fasteners">Fasteners</option>
+            <option value="Packaging">Packaging</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Tools">Tools</option>
+          </select>
+          <button class="btn btn-secondary" onclick="exportProducts()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export
+          </button>
+          <button class="btn btn-primary" onclick="openModal('addProductModal')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Product
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats row -->
+      <div class="prod-stats">
+        <div class="prod-stat"><span class="ps-val" id="psTotal">—</span><span class="ps-lbl">Total Products</span></div>
+        <div class="prod-stat warn"><span class="ps-val" id="psLow">—</span><span class="ps-lbl">Low / Out of Stock</span></div>
+        <div class="prod-stat"><span class="ps-val" id="psCats">—</span><span class="ps-lbl">Categories</span></div>
+        <div class="prod-stat"><span class="ps-val" id="psActive">—</span><span class="ps-lbl">Active SKUs</span></div>
+      </div>
+
+      <!-- Filters -->
+      <div class="panel" style="margin-bottom:16px;">
+        <div style="padding:12px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <input type="text" class="form-control" style="height:34px;width:220px;font-size:.82rem;" placeholder="Search by name or SKU…" id="prodSearch"/>
+          <select class="form-control form-select" style="height:34px;width:130px;font-size:.8rem;" id="stockFilter">
+            <option value="all">All Stock</option>
+            <option value="healthy">Healthy</option>
+            <option value="low">Low Stock</option>
+            <option value="out">Out of Stock</option>
+          </select>
+          <select class="form-control form-select" style="height:34px;width:130px;font-size:.8rem;" id="locFilter">
+            <option value="all">All Locations</option>
+            <option value="Main WH">Main WH</option>
+            <option value="Warehouse B">Warehouse B</option>
+            <option value="Warehouse C">Warehouse C</option>
+          </select>
+          <span style="font-size:.75rem;color:var(--text-3);margin-left:auto;" id="prodCount"></span>
+        </div>
+      </div>
+
+      <!-- Products Table -->
+      <div class="panel" style="animation: fadeUp .35s ease both;">
+        <div class="table-scroll">
+          <table class="data-table" id="productsTable">
+            <thead>
+              <tr>
+                <th>Product / SKU</th>
+                <th>Category</th>
+                <th>Unit</th>
+                <th>Stock</th>
+                <th>Min Stock</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="productsBody"></tbody>
+          </table>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-top:1px solid var(--border);">
+          <span style="font-size:.72rem;color:var(--text-3);" id="prodPageCount"></span>
+          <div style="display:flex;gap:4px;" id="prodPager"></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ADD PRODUCT MODAL -->
+<div class="modal-overlay" id="addProductModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <span class="modal-title">Add New Product</span>
+      <button class="modal-close" onclick="closeModal('addProductModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Product Name *</label>
+          <input type="text" class="form-control" id="newProdName" placeholder="e.g. Steel Rods"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">SKU / Code *</label>
+          <input type="text" class="form-control" id="newProdSku" placeholder="e.g. SKU-00001"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-control form-select" id="newProdCat">
+            <option value="">Select category</option>
+            <option>Raw Materials</option>
+            <option>Fasteners</option>
+            <option>Packaging</option>
+            <option>Electronics</option>
+            <option>Tools</option>
+            <option>Safety Gear</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Unit of Measure</label>
+          <select class="form-control form-select" id="newProdUnit">
+            <option value="pcs">pcs</option>
+            <option value="kg">kg</option>
+            <option value="box">box</option>
+            <option value="roll">roll</option>
+            <option value="litre">litre</option>
+            <option value="meter">meter</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Initial Stock</label>
+          <input type="number" class="form-control" id="newProdStock" placeholder="0" min="0"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Min Stock Level</label>
+          <input type="number" class="form-control" id="newProdMin" placeholder="10" min="0"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Location</label>
+          <select class="form-control form-select" id="newProdLoc">
+            <option>Main WH</option>
+            <option>Warehouse B</option>
+            <option>Warehouse C</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Reorder Qty</label>
+          <input type="number" class="form-control" id="newProdReorder" placeholder="50" min="0"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-control" id="newProdDesc" rows="2" placeholder="Optional product description…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('addProductModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="addProduct()">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT PRODUCT MODAL -->
+<div class="modal-overlay" id="editProductModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <span class="modal-title">Edit Product</span>
+      <button class="modal-close" onclick="closeModal('editProductModal')">✕</button>
+    </div>
+    <div class="modal-body" id="editModalBody">
+      <!-- Populated by JS -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" onclick="deleteProduct()">Delete</button>
+      <button class="btn btn-secondary" onclick="closeModal('editProductModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script src="../shared/utils.js"></script>
+<script src="products.js"></script>
+</body>
+</html>

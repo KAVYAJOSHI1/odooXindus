@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Warehouse Settings — ShelfControl</title>
+  <link rel="stylesheet" href="../shared/layout.css"/>
+  <link rel="stylesheet" href="settings.css"/>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-wrap">
+    <header class="topbar" id="topbar"></header>
+    <main class="page-body">
+
+      <div class="page-hdr">
+        <div>
+          <h1 class="page-title">Warehouse Settings</h1>
+          <p class="page-sub">Manage warehouses, locations, and rack sections</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary" id="addBtn" onclick="openAddPanel()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Warehouse
+          </button>
+        </div>
+      </div>
+
+      <!-- Settings Tabs -->
+      <div class="settings-tabs">
+        <button class="settings-tab active" onclick="switchTab(this,'warehouses')">Warehouses</button>
+        <button class="settings-tab" onclick="switchTab(this,'locations')">Locations</button>
+        <button class="settings-tab" onclick="switchTab(this,'racks')">Rack Sections</button>
+      </div>
+
+      <!-- WAREHOUSES TAB -->
+      <div id="tab-warehouses">
+        <div class="wh-grid" id="whGrid"></div>
+      </div>
+
+      <!-- LOCATIONS TAB -->
+      <div id="tab-locations" style="display:none;">
+        <div class="panel">
+          <div class="panel-hdr">
+            <span class="panel-title">Locations</span>
+            <button class="btn btn-primary btn-sm" onclick="openModal('addLocModal')">+ Add Location</button>
+          </div>
+          <div class="table-scroll">
+            <table class="data-table" id="locTable">
+              <thead><tr><th>Location Name</th><th>Short Code</th><th>Warehouse</th><th>Type</th><th>Actions</th></tr></thead>
+              <tbody id="locBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- RACKS TAB -->
+      <div id="tab-racks" style="display:none;">
+        <div class="panel">
+          <div class="panel-hdr">
+            <span class="panel-title">Rack Sections</span>
+            <button class="btn btn-primary btn-sm" onclick="openModal('addRackModal')">+ Add Rack</button>
+          </div>
+          <div class="table-scroll">
+            <table class="data-table" id="rackTable">
+              <thead><tr><th>Rack Name</th><th>Location</th><th>Warehouse</th><th>Capacity</th><th>Actions</th></tr></thead>
+              <tbody id="rackBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ADD/EDIT WAREHOUSE MODAL -->
+<div class="modal-overlay" id="whModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <span class="modal-title" id="whModalTitle">Add Warehouse</span>
+      <button class="modal-close" onclick="closeModal('whModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Warehouse Name *</label>
+        <input type="text" class="form-control" id="whName" placeholder="e.g. Main Warehouse"/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Short Code *</label>
+          <input type="text" class="form-control" id="whCode" placeholder="e.g. WH" maxlength="5" style="text-transform:uppercase;"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select class="form-control form-select" id="whType">
+            <option>Storage</option>
+            <option>Production</option>
+            <option>Distribution</option>
+            <option>Retail</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Address</label>
+        <textarea class="form-control" id="whAddress" rows="2" placeholder="Warehouse address…"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Manager</label>
+        <input type="text" class="form-control" id="whManager" placeholder="Warehouse manager name"/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('whModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveWarehouse()">Save Warehouse</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD LOCATION MODAL -->
+<div class="modal-overlay" id="addLocModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <span class="modal-title">Add Location</span>
+      <button class="modal-close" onclick="closeModal('addLocModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Location Name *</label>
+          <input type="text" class="form-control" id="locName" placeholder="e.g. Stock Zone A"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Short Code</label>
+          <input type="text" class="form-control" id="locCode" placeholder="e.g. WH/SZA" maxlength="10"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Warehouse *</label>
+          <select class="form-control form-select" id="locWarehouse">
+            <option>Main WH</option><option>Warehouse B</option><option>Warehouse C</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select class="form-control form-select" id="locType">
+            <option>Internal</option><option>External</option><option>Virtual</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('addLocModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveLocation()">Save Location</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD RACK MODAL -->
+<div class="modal-overlay" id="addRackModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <span class="modal-title">Add Rack Section</span>
+      <button class="modal-close" onclick="closeModal('addRackModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Rack Name *</label>
+          <input type="text" class="form-control" id="rackName" placeholder="e.g. Rack A"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Capacity (units)</label>
+          <input type="number" class="form-control" id="rackCap" placeholder="500" min="1"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Location *</label>
+          <select class="form-control form-select" id="rackLoc">
+            <option>Stock Zone A</option><option>Stock Zone B</option><option>Production Floor</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Warehouse</label>
+          <select class="form-control form-select" id="rackWH">
+            <option>Main WH</option><option>Warehouse B</option><option>Warehouse C</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('addRackModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveRack()">Save Rack</button>
+    </div>
+  </div>
+</div>
+
+<script src="../shared/utils.js"></script>
+<script src="settings.js"></script>
+</body>
+</html>

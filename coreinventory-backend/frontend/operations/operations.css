@@ -1,0 +1,86 @@
+/* ShelfControl — operations/operations.css */
+
+/* Workflow steps */
+.workflow-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 22px;
+}
+.wf-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+.wf-step-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--surface-3);
+  border: 2px solid var(--border);
+  display: grid; place-items: center;
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--text-3);
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+.wf-step.active .wf-step-num  { background: var(--teal); border-color: var(--teal); color: #fff; }
+.wf-step.done .wf-step-num    { background: var(--green); border-color: var(--green); color: #fff; }
+.wf-step-label { font-size: .78rem; font-weight: 500; color: var(--text-3); }
+.wf-step.active .wf-step-label { color: var(--text); }
+.wf-step.done .wf-step-label   { color: var(--green); }
+.wf-connector { flex: 1; height: 2px; background: var(--border); max-width: 40px; margin: 0 6px; }
+.wf-connector.done { background: var(--green); }
+
+/* Op status filter tabs */
+.status-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--surface-3);
+  border-radius: var(--r-sm);
+  padding: 3px;
+  border: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.status-tab {
+  background: none;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-size: .75rem;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+.status-tab.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-xs); }
+.status-tab.active.done     { color: var(--green); }
+.status-tab.active.waiting  { color: var(--amber); }
+.status-tab.active.ready    { color: var(--teal); }
+.status-tab.active.canceled { color: var(--rose); }
+
+/* Product lines in forms */
+.product-lines { border: 1px solid var(--border); border-radius: var(--r-sm); overflow: hidden; }
+.product-line {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr auto;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+}
+.product-line:last-child { border-bottom: none; }
+.product-line-hdr {
+  background: var(--surface-2);
+  font-size: .68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--text-3);
+}
+.line-remove { background: none; border: none; color: var(--text-3); cursor: pointer; padding: 4px; border-radius: 4px; transition: var(--transition); }
+.line-remove:hover { color: var(--rose); background: var(--rose-light); }
+.add-line-btn { font-size: .78rem; color: var(--teal); cursor: pointer; background: none; border: 1px dashed var(--teal); border-radius: var(--r-sm); padding: 8px; width: 100%; text-align: center; margin-top: 8px; transition: var(--transition); }
+.add-line-btn:hover { background: var(--teal-light); }

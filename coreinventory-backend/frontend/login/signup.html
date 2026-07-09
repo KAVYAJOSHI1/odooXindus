@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up — ShelfControl</title>
+  <link rel="stylesheet" href="auth.css"/>
+</head>
+<body>
+  <div class="auth-left">
+    <div class="auth-brand">
+      <div class="auth-brand-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <rect x="2" y="2" width="9" height="9" rx="1.5" fill="currentColor"/>
+          <rect x="13" y="2" width="9" height="9" rx="1.5" fill="currentColor" opacity=".5"/>
+          <rect x="2" y="13" width="9" height="9" rx="1.5" fill="currentColor" opacity=".5"/>
+          <rect x="13" y="13" width="9" height="9" rx="1.5" fill="currentColor"/>
+        </svg>
+      </div>
+      <span class="auth-brand-name">ShelfControl</span>
+    </div>
+
+    <div class="auth-form">
+      <h1 class="auth-title">Create account</h1>
+      <p class="auth-sub">Set up your inventory workspace in seconds</p>
+
+      <div class="form-alert error" id="signupError"></div>
+
+      <div class="form-row-2">
+        <div class="form-group">
+          <label class="form-label">First Name</label>
+          <input type="text" class="form-control" id="firstName" placeholder="Raj" autocomplete="given-name"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name</label>
+          <input type="text" class="form-control" id="lastName" placeholder="Kumar" autocomplete="family-name"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email address</label>
+        <input type="email" class="form-control" id="signupEmail" placeholder="you@company.com" autocomplete="email"/>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Role</label>
+        <select class="form-control" id="signupRole">
+          <option value="">Select your role</option>
+          <option value="manager">Inventory Manager</option>
+          <option value="staff">Warehouse Staff</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="input-wrap">
+          <input type="password" class="form-control" id="signupPassword" placeholder="Min. 8 characters" autocomplete="new-password"/>
+          <button type="button" class="input-toggle" onclick="togglePwd('signupPassword', this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Confirm Password</label>
+        <div class="input-wrap">
+          <input type="password" class="form-control" id="confirmPassword" placeholder="Repeat password" autocomplete="new-password"/>
+          <button type="button" class="input-toggle" onclick="togglePwd('confirmPassword', this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:12px;">
+        <input type="checkbox" id="agreeTerms" style="accent-color:#0d9488;width:14px;height:14px;margin-top:2px;"/>
+        <label for="agreeTerms" style="font-size:.78rem;color:#5a6580;cursor:pointer;line-height:1.4;">
+          I agree to the <a href="#" style="color:#0d9488;">Terms of Service</a> and <a href="#" style="color:#0d9488;">Privacy Policy</a>
+        </label>
+      </div>
+
+      <button class="btn-auth" onclick="handleSignup()">Create Account</button>
+
+      <div class="auth-link">Already have an account? <a href="login.html">Sign in</a></div>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-right-inner">
+      <h2>Everything your<br/>warehouse needs.</h2>
+      <p>From incoming receipts to delivery orders and stock adjustments — all in one clean, fast interface.</p>
+      <div class="auth-grid">
+        <div class="auth-stat">
+          <div class="auth-stat-num">Real-time</div>
+          <div class="auth-stat-lbl">Stock updates</div>
+        </div>
+        <div class="auth-stat">
+          <div class="auth-stat-num">Multi-WH</div>
+          <div class="auth-stat-lbl">Warehouse support</div>
+        </div>
+        <div class="auth-stat">
+          <div class="auth-stat-num">OTP</div>
+          <div class="auth-stat-lbl">Secure auth</div>
+        </div>
+        <div class="auth-stat">
+          <div class="auth-stat-num">Free</div>
+          <div class="auth-stat-lbl">During hackathon</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+</body>
+</html>

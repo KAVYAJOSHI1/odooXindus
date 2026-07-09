@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — ShelfControl</title>
+  <link rel="stylesheet" href="../shared/layout.css" />
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+
+<body>
+  <div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <!-- MAIN -->
+    <div class="main-wrap">
+      <header class="topbar" id="topbar"></header>
+
+      <main class="page-body">
+
+        <!-- PAGE HEADER -->
+        <div class="page-hdr">
+          <div>
+            <h1 class="page-title">Dashboard</h1>
+            <p class="page-sub">Real-time inventory overview · <span id="liveTime"></span></p>
+          </div>
+          <div class="page-actions">
+            <select class="form-control form-select" style="width:160px;height:34px;font-size:.8rem;" id="whFilter">
+              <option value="all">All Warehouses</option>
+              <option value="main">Main Warehouse</option>
+              <option value="b">Warehouse B</option>
+              <option value="c">Warehouse C</option>
+            </select>
+            <select class="form-control form-select" style="width:140px;height:34px;font-size:.8rem;" id="typeFilter">
+              <option value="all">All Types</option>
+              <option value="receipt">Receipts</option>
+              <option value="delivery">Deliveries</option>
+              <option value="transfer">Transfers</option>
+              <option value="adjustment">Adjustments</option>
+            </select>
+            <a href="../operations/receipts.html" class="btn btn-primary">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              New Receipt
+            </a>
+          </div>
+        </div>
+
+        <!-- KPI CARDS -->
+        <div class="kpi-grid">
+          <div class="kpi-card anim-1">
+            <div class="kpi-ico teal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path
+                  d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+              </svg>
+            </div>
+            <div>
+              <span class="kpi-lbl">Total Products</span>
+              <span class="kpi-val" id="kpiProducts">0</span>
+              <span class="kpi-delta pos">+12 this week</span>
+            </div>
+          </div>
+          <div class="kpi-card anim-2">
+            <div class="kpi-ico amber">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+            </div>
+            <div>
+              <span class="kpi-lbl">Low Stock</span>
+              <span class="kpi-val" id="kpiLow">0</span>
+              <span class="kpi-delta neg">+3 since yesterday</span>
+            </div>
+          </div>
+          <div class="kpi-card anim-3">
+            <div class="kpi-ico blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <polyline points="22 12 16 12 14 15 10 15 8 12 2 12" />
+                <path
+                  d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
+              </svg>
+            </div>
+            <div>
+              <span class="kpi-lbl">Pending Receipts</span>
+              <span class="kpi-val" id="kpiReceipts">0</span>
+              <span class="kpi-delta neu">From 8 suppliers</span>
+            </div>
+          </div>
+          <div class="kpi-card anim-4">
+            <div class="kpi-ico rose">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <rect x="1" y="3" width="15" height="13" rx="1" />
+                <path d="M16 8h4l3 5v3h-7V8z" />
+                <circle cx="5.5" cy="18.5" r="2.5" />
+                <circle cx="18.5" cy="18.5" r="2.5" />
+              </svg>
+            </div>
+            <div>
+              <span class="kpi-lbl">Pending Deliveries</span>
+              <span class="kpi-val" id="kpiDeliveries">0</span>
+              <span class="kpi-delta neg">3 overdue</span>
+            </div>
+          </div>
+          <div class="kpi-card anim-5">
+            <div class="kpi-ico purple">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <polyline points="17 1 21 5 17 9" />
+                <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                <polyline points="7 23 3 19 7 15" />
+                <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+              </svg>
+            </div>
+            <div>
+              <span class="kpi-lbl">Transfers Scheduled</span>
+              <span class="kpi-val" id="kpiTransfers">0</span>
+              <span class="kpi-delta neu">Across 3 warehouses</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <div class="quick-actions">
+          <a href="../operations/receipts.html" class="qa-btn">
+            <div class="qa-ico teal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18">
+                <polyline points="22 12 16 12 14 15 10 15 8 12 2 12" />
+                <path
+                  d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
+              </svg>
+            </div>
+            Create Receipt
+          </a>
+          <a href="../operations/deliveries.html" class="qa-btn">
+            <div class="qa-ico blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18">
+                <rect x="1" y="3" width="15" height="13" rx="1" />
+                <path d="M16 8h4l3 5v3h-7V8z" />
+                <circle cx="5.5" cy="18.5" r="2.5" />
+                <circle cx="18.5" cy="18.5" r="2.5" />
+              </svg>
+            </div>
+            Create Delivery
+          </a>
+          <a href="../products/products.html" class="qa-btn">
+            <div class="qa-ico amber">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+            </div>
+            Add Product
+          </a>
+          <a href="../operations/transfers.html" class="qa-btn">
+            <div class="qa-ico purple">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18">
+                <polyline points="17 1 21 5 17 9" />
+                <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+                <polyline points="7 23 3 19 7 15" />
+                <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+              </svg>
+            </div>
+            Transfer Stock
+          </a>
+        </div>
+
+        <!-- MID GRID: Kanban + Stock Alerts -->
+        <div class="dash-grid">
+
+          <!-- KANBAN BOARD -->
+          <div class="panel" style="animation: fadeUp .4s ease both .1s;">
+            <div class="panel-hdr">
+              <span class="panel-title">Operations Workflow</span>
+              <div style="display:flex;gap:6px;">
+                <select class="form-control form-select" style="height:28px;font-size:.72rem;width:120px;"
+                  id="kanbanFilter">
+                  <option value="all">All Types</option>
+                  <option value="receipt">Receipts</option>
+                  <option value="delivery">Deliveries</option>
+                  <option value="transfer">Transfers</option>
+                </select>
+              </div>
+            </div>
+            <div class="kanban-board" id="kanbanBoard"></div>
+          </div>
+
+          <!-- STOCK ALERTS -->
+          <div class="panel" style="animation: fadeUp .4s ease both .15s;">
+            <div class="panel-hdr">
+              <span class="panel-title">Stock Alerts</span>
+              <a href="../products/products.html" class="panel-link">View all</a>
+            </div>
+            <div class="table-scroll">
+              <table class="data-table" id="alertsTable">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Stock</th>
+                    <th>Min</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="alertsBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACTIVITY TABLE -->
+        <div class="panel" style="margin-top:20px;animation: fadeUp .4s ease both .2s;">
+          <div class="panel-hdr">
+            <span class="panel-title">Recent Inventory Activity</span>
+            <div style="display:flex;gap:8px;">
+              <select class="form-control form-select" style="height:28px;font-size:.72rem;width:120px;"
+                id="actTypeFil">
+                <option value="all">All Types</option>
+                <option value="receipt">Receipt</option>
+                <option value="delivery">Delivery</option>
+                <option value="transfer">Transfer</option>
+                <option value="adjustment">Adjustment</option>
+              </select>
+              <select class="form-control form-select" style="height:28px;font-size:.72rem;width:110px;"
+                id="actStatusFil">
+                <option value="all">All Status</option>
+                <option value="Done">Done</option>
+                <option value="Ready">Ready</option>
+                <option value="Waiting">Waiting</option>
+                <option value="Draft">Draft</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table class="data-table" id="activityTable">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Operation / Ref</th>
+                  <th>Product</th>
+                  <th>Quantity</th>
+                  <th>Warehouse</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="activityBody"></tbody>
+            </table>
+          </div>
+          <div
+            style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-top:1px solid var(--border);">
+            <span style="font-size:.72rem;color:var(--text-3);" id="actCount"></span>
+            <div style="display:flex;gap:4px;" id="actPager"></div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script>
+    function plusIconInline() { return ''; } // placeholder — utils.js provides it
+  </script>
+  <script src="../shared/utils.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+
+</html>

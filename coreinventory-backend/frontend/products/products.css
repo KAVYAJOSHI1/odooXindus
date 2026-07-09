@@ -1,0 +1,23 @@
+/* ShelfControl — products/products.css */
+
+.prod-stats {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.prod-stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 120px;
+  box-shadow: var(--shadow-xs);
+}
+.prod-stat.warn { border-color: rgba(217,119,6,.3); background: var(--amber-light); }
+.ps-val { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; color: var(--text); letter-spacing: -.03em; }
+.ps-lbl { font-size: .7rem; color: var(--text-2); font-weight: 500; }
+.prod-stat.warn .ps-val { color: var(--amber); }

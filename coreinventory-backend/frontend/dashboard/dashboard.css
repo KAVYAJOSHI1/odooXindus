@@ -1,0 +1,148 @@
+/* ═══════════════════════════════════════════════════
+   ShelfControl — dashboard/dashboard.css
+═══════════════════════════════════════════════════ */
+
+/* ── QUICK ACTIONS ────────────────────────────────── */
+.quick-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.qa-btn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 10px 16px;
+  font-size: .82rem;
+  font-weight: 500;
+  color: var(--text);
+  text-decoration: none;
+  transition: var(--transition);
+  box-shadow: var(--shadow-xs);
+}
+.qa-btn:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--teal);
+  color: var(--teal);
+}
+.qa-ico {
+  width: 32px; height: 32px;
+  border-radius: 7px;
+  display: grid; place-items: center;
+  flex-shrink: 0;
+}
+.qa-ico.teal   { background: var(--teal-light);   color: var(--teal); }
+.qa-ico.blue   { background: var(--blue-light);   color: var(--blue); }
+.qa-ico.amber  { background: var(--amber-light);  color: var(--amber); }
+.qa-ico.purple { background: var(--purple-light); color: var(--purple); }
+
+/* ── DASH GRID ────────────────────────────────────── */
+.dash-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 16px;
+  margin-bottom: 0;
+}
+
+/* ── KANBAN ───────────────────────────────────────── */
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  overflow-x: auto;
+  padding: 14px;
+}
+.kanban-col {
+  min-width: 160px;
+  padding: 0 6px;
+}
+.kanban-col-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--border);
+}
+.kanban-col-hdr.draft   { border-color: var(--text-3); }
+.kanban-col-hdr.waiting { border-color: var(--amber); }
+.kanban-col-hdr.ready   { border-color: var(--teal); }
+.kanban-col-hdr.done    { border-color: var(--green); }
+
+.kanban-col-name {
+  font-size: .72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--text-2);
+}
+.kanban-count {
+  font-family: 'DM Mono', monospace;
+  font-size: .65rem;
+  background: var(--surface-3);
+  color: var(--text-3);
+  padding: 2px 6px;
+  border-radius: 99px;
+}
+
+.kanban-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 10px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow-xs);
+  transition: var(--transition);
+  cursor: pointer;
+}
+.kanban-card:hover {
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+  border-color: var(--teal);
+}
+.kanban-card-id {
+  font-family: 'DM Mono', monospace;
+  font-size: .65rem;
+  color: var(--teal);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.kanban-card-title {
+  font-size: .78rem;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+.kanban-card-meta {
+  font-size: .7rem;
+  color: var(--text-2);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* ── ALERTS TABLE ─────────────────────────────────── */
+.stock-indicator {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+.stock-indicator.healthy { background: var(--green); }
+.stock-indicator.low     { background: var(--amber); }
+.stock-indicator.out     { background: var(--rose); }
+
+@media (max-width: 1100px) {
+  .dash-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .kanban-board { grid-template-columns: repeat(2, 1fr); }
+  .quick-actions .qa-btn { flex: 1; min-width: calc(50% - 5px); }
+}

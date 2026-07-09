@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stock Adjustments — ShelfControl</title>
+  <link rel="stylesheet" href="../shared/layout.css"/>
+  <link rel="stylesheet" href="operations.css"/>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-wrap">
+    <header class="topbar" id="topbar"></header>
+    <main class="page-body">
+
+      <div class="page-hdr">
+        <div>
+          <h1 class="page-title">Stock Adjustments</h1>
+          <p class="page-sub">Fix discrepancies between recorded and physical stock counts</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary" onclick="openModal('createAdjModal')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Adjustment
+          </button>
+        </div>
+      </div>
+
+      <!-- Info Banner -->
+      <div style="background:var(--purple-light);border:1px solid rgba(124,58,237,.2);border-radius:var(--r-sm);padding:12px 16px;margin-bottom:18px;font-size:.82rem;color:#5b21b6;display:flex;gap:10px;align-items:flex-start;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span>Stock adjustments correct mismatches between the system record and a physical count. Every adjustment is logged permanently in Move History.</span>
+      </div>
+
+      <!-- Adjustments Table -->
+      <div class="panel" style="animation: fadeUp .35s ease both;">
+        <div class="panel-hdr">
+          <span class="panel-title">Adjustment Log</span>
+          <div style="display:flex;gap:8px;">
+            <select class="form-control form-select" style="height:30px;width:130px;font-size:.75rem;" id="adjLocFil">
+              <option value="all">All Locations</option>
+              <option>Main WH</option>
+              <option>Warehouse B</option>
+              <option>Warehouse C</option>
+            </select>
+            <input type="text" class="form-control" style="height:30px;width:180px;font-size:.78rem;" id="adjSearch" placeholder="Search…"/>
+          </div>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table" id="adjTable">
+            <thead>
+              <tr>
+                <th>Ref. No.</th>
+                <th>Product</th>
+                <th>Location</th>
+                <th>Recorded Qty</th>
+                <th>Counted Qty</th>
+                <th>Difference</th>
+                <th>User</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="adjBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- CREATE ADJUSTMENT MODAL -->
+<div class="modal-overlay" id="createAdjModal">
+  <div class="modal modal-lg">
+    <div class="modal-hdr">
+      <span class="modal-title">New Stock Adjustment</span>
+      <button class="modal-close" onclick="closeModal('createAdjModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:var(--amber-light);border:1px solid rgba(217,119,6,.2);border-radius:var(--r-sm);padding:10px 14px;margin-bottom:16px;font-size:.78rem;color:#92400e;">
+        ⚠️ Adjustments are <strong>irreversible</strong>. Ensure the physical count is accurate before validating.
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Product *</label>
+          <select class="form-control form-select" id="adjProduct">
+            <option value="">Select product</option>
+            <option value="Steel Rods|SKU-00124|0">Steel Rods (SKU-00124) — Current: 0</option>
+            <option value="Copper Wire|SKU-00087|8">Copper Wire (SKU-00087) — Current: 8</option>
+            <option value="Rubber Gaskets|SKU-00056|5">Rubber Gaskets (SKU-00056) — Current: 5</option>
+            <option value="Plastic Casing|SKU-00201|12">Plastic Casing (SKU-00201) — Current: 12</option>
+            <option value="Bolt Set M12|SKU-00033|0">Bolt Set M12 (SKU-00033) — Current: 0</option>
+            <option value="Aluminium Sheet|SKU-00198|120">Aluminium Sheet (SKU-00198) — Current: 120</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Location *</label>
+          <select class="form-control form-select" id="adjLocation">
+            <option value="">Select location</option>
+            <option>Main WH</option>
+            <option>Warehouse B</option>
+            <option>Warehouse C</option>
+            <option>Production Floor</option>
+            <option>Rack A</option>
+            <option>Rack B</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Live diff calculator -->
+      <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:16px;margin-bottom:14px;" id="adjCalcPanel">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;text-align:center;">
+          <div>
+            <div style="font-size:.68rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Recorded Stock</div>
+            <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--text);" id="adjRecorded">—</div>
+          </div>
+          <div>
+            <div style="font-size:.68rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Counted Qty</div>
+            <input type="number" id="adjCounted" min="0" class="form-control" style="text-align:center;font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:700;height:52px;" placeholder="0" oninput="calcDiff()"/>
+          </div>
+          <div>
+            <div style="font-size:.68rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Difference</div>
+            <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;" id="adjDiff">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Reason for Adjustment *</label>
+        <select class="form-control form-select" id="adjReason">
+          <option value="">Select reason</option>
+          <option>Physical count correction</option>
+          <option>Damaged goods write-off</option>
+          <option>Theft / loss</option>
+          <option>Expired / obsolete</option>
+          <option>Data entry error correction</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea class="form-control" id="adjNotes" rows="2" placeholder="Optional additional notes…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('createAdjModal')">Cancel</button>
+      <button class="btn btn-secondary" onclick="saveAdjustment('Draft')">Save as Draft</button>
+      <button class="btn btn-primary" onclick="saveAdjustment('Done')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        Validate Adjustment
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="../shared/utils.js"></script>
+<script src="operations.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  injectSidebar('adjustments');
+  injectTopbar('Stock Adjustments');
+  renderAdjTable();
+
+  document.getElementById('adjProduct')?.addEventListener('change', function() {
+    const val = this.value.split('|');
+    const recorded = val[2] ? parseInt(val[2]) : null;
+    const recEl = document.getElementById('adjRecorded');
+    if (recEl) recEl.textContent = recorded !== null ? recorded : '—';
+    calcDiff();
+  });
+});
+
+function calcDiff() {
+  const sel = document.getElementById('adjProduct')?.value.split('|');
+  const recorded = sel && sel[2] ? parseInt(sel[2]) : null;
+  const counted  = parseInt(document.getElementById('adjCounted')?.value);
+  const diffEl   = document.getElementById('adjDiff');
+  if (!diffEl) return;
+  if (recorded === null || isNaN(counted)) { diffEl.textContent = '—'; diffEl.style.color = 'var(--text-3)'; return; }
+  const diff = counted - recorded;
+  diffEl.textContent = (diff >= 0 ? '+' : '') + diff;
+  diffEl.style.color = diff > 0 ? 'var(--green)' : diff < 0 ? 'var(--rose)' : 'var(--text-3)';
+}
+
+function saveAdjustment(status) {
+  const locId = parseInt(document.getElementById('adjLocation')?.value);
+  const reason = document.getElementById('adjReason')?.value;
+  const prodSel = document.getElementById('adjProduct')?.value;
+  const counted = parseInt(document.getElementById('adjCounted')?.value);
+
+  if (!locId || !reason || !prodSel || isNaN(counted)) { 
+    showToast('Fill all fields and enter counted quantity', 'error'); return; 
+  }
+  const ref = 'ADJ-' + String(ADJ_DATA.length + 1).padStart(4, '0');
+  const prodId = parseInt(prodSel.split('|')[0]);
+  
+  const payload = {
+    ref,
+    location_id: locId,
+    reason,
+    items: [
+      { product_id: prodId, counted_quantity: counted }
+    ]
+  };
+
+  fetch('/api/adjustments/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).then(res => res.json()).then(data => {
+    ADJ_DATA.unshift({
+      ref, product: 'Multiple', sku: '—', loc: 'Location',
+      recorded: '—', counted: '—', diff: '—',
+      user: JSON.parse(localStorage.getItem('ci_user')||'{}').name || 'System',
+      date: new Date().toISOString().slice(0,10), status: status || 'Done', reason
+    });
+    closeModal('createAdjModal');
+    showToast(`Adjustment ${ref} posted`, 'success');
+    renderOpsTable('adjustments');
+  }).catch(err => showToast(err.message, 'error'));
+}
+</script>
+</body>
+</html>

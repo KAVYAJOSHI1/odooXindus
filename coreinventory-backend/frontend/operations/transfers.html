@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Internal Transfers — ShelfControl</title>
+  <link rel="stylesheet" href="../shared/layout.css"/>
+  <link rel="stylesheet" href="operations.css"/>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-wrap">
+    <header class="topbar" id="topbar"></header>
+    <main class="page-body">
+
+      <div class="page-hdr">
+        <div>
+          <h1 class="page-title">Internal Transfers</h1>
+          <p class="page-sub">Move stock between locations within your warehouse network</p>
+        </div>
+        <div class="page-actions">
+          <div class="status-tabs">
+            <button class="status-tab active" onclick="filterTab(this,'all')">All</button>
+            <button class="status-tab" onclick="filterTab(this,'Draft')">Draft</button>
+            <button class="status-tab" onclick="filterTab(this,'Ready')">Ready</button>
+            <button class="status-tab" onclick="filterTab(this,'Done')">Done</button>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('createTransferModal')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New Transfer
+          </button>
+        </div>
+      </div>
+
+      <div class="panel" style="animation: fadeUp .35s ease both;">
+        <div class="panel-hdr">
+          <span class="panel-title">Transfer History</span>
+          <input type="text" class="form-control" style="height:30px;width:200px;font-size:.78rem;" id="transferSearch" placeholder="Search…"/>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table" id="transfersTable">
+            <thead>
+              <tr>
+                <th>Transfer ID</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="transfersBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- CREATE TRANSFER MODAL -->
+<div class="modal-overlay" id="createTransferModal">
+  <div class="modal modal-lg">
+    <div class="modal-hdr">
+      <span class="modal-title">New Internal Transfer</span>
+      <button class="modal-close" onclick="closeModal('createTransferModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:var(--blue-light);border:1px solid rgba(37,99,235,.2);border-radius:var(--r-sm);padding:10px 14px;font-size:.78rem;color:var(--blue);margin-bottom:16px;">
+        <strong>ℹ️ Internal transfers</strong> move stock between locations. Total inventory is unchanged — only location is updated.
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">From Location *</label>
+          <select class="form-control form-select" id="trfFrom">
+            <option value="">Select source</option>
+            <option>Main WH</option>
+            <option>Warehouse B</option>
+            <option>Warehouse C</option>
+            <option>Production Floor</option>
+            <option>Rack A</option>
+            <option>Rack B</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">To Location *</label>
+          <select class="form-control form-select" id="trfTo">
+            <option value="">Select destination</option>
+            <option>Main WH</option>
+            <option>Warehouse B</option>
+            <option>Warehouse C</option>
+            <option>Production Floor</option>
+            <option>Rack A</option>
+            <option>Rack B</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Scheduled Date</label>
+        <input type="date" class="form-control" id="trfDate"/>
+      </div>
+      <div class="product-lines" id="trfLines">
+        <div class="product-line product-line-hdr">
+          <span>Product</span><span>Quantity</span><span>Unit</span><span></span>
+        </div>
+      </div>
+      <button class="add-line-btn" onclick="addTransferLine()">+ Add Product Line</button>
+      <div class="form-group" style="margin-top:14px;">
+        <label class="form-label">Reason / Notes</label>
+        <textarea class="form-control" id="trfNotes" rows="2" placeholder="Reason for transfer…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('createTransferModal')">Cancel</button>
+      <button class="btn btn-secondary" onclick="saveTransfer('Draft')">Save as Draft</button>
+      <button class="btn btn-primary" onclick="saveTransfer('Ready')">Mark as Ready</button>
+    </div>
+  </div>
+</div>
+
+<script src="../shared/utils.js"></script>
+<script src="operations.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  injectSidebar('transfers');
+  injectTopbar('Internal Transfers');
+  const dateEl = document.getElementById('trfDate');
+  if (dateEl) dateEl.valueAsDate = new Date();
+  addTransferLine();
+  renderOpsTable('transfers');
+});
+</script>
+</body>
+</html>

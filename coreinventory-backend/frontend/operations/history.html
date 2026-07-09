@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Move History — ShelfControl</title>
+  <link rel="stylesheet" href="../shared/layout.css"/>
+  <link rel="stylesheet" href="operations.css"/>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-wrap">
+    <header class="topbar" id="topbar"></header>
+    <main class="page-body">
+
+      <div class="page-hdr">
+        <div>
+          <h1 class="page-title">Move History</h1>
+          <p class="page-sub">Complete stock ledger — every movement logged permanently</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-secondary" onclick="exportHistory()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="panel" style="margin-bottom:16px;">
+        <div style="padding:12px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <input type="text" class="form-control" style="height:34px;width:200px;font-size:.82rem;" id="histSearch" placeholder="Search product, ref, user…"/>
+          <select class="form-control form-select" style="height:34px;width:130px;font-size:.8rem;" id="histTypeFil">
+            <option value="all">All Types</option>
+            <option value="IN">IN (Incoming)</option>
+            <option value="OUT">OUT (Outgoing)</option>
+            <option value="INT">Internal</option>
+            <option value="ADJ">Adjustment</option>
+          </select>
+          <select class="form-control form-select" style="height:34px;width:140px;font-size:.8rem;" id="histLocFil">
+            <option value="all">All Locations</option>
+            <option>Main WH</option>
+            <option>Warehouse B</option>
+            <option>Warehouse C</option>
+            <option>Production Floor</option>
+          </select>
+          <input type="date" class="form-control" style="height:34px;width:140px;font-size:.8rem;" id="histDateFrom"/>
+          <input type="date" class="form-control" style="height:34px;width:140px;font-size:.8rem;" id="histDateTo"/>
+          <button class="btn btn-secondary" onclick="applyHistFilters()">Filter</button>
+          <button class="btn btn-secondary" onclick="clearHistFilters()" style="padding: 0 10px;">✕ Clear</button>
+        </div>
+      </div>
+
+      <!-- Ledger Table -->
+      <div class="panel" style="animation: fadeUp .35s ease both;">
+        <div class="panel-hdr">
+          <span class="panel-title">Stock Ledger</span>
+          <span id="histCount" style="font-size:.75rem;color:var(--text-3);"></span>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table" id="historyTable">
+            <thead>
+              <tr>
+                <th>Date & Time</th>
+                <th>Reference</th>
+                <th>Type</th>
+                <th>Product</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Qty Change</th>
+                <th>Location</th>
+                <th>User</th>
+              </tr>
+            </thead>
+            <tbody id="histBody"></tbody>
+          </table>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-top:1px solid var(--border);">
+          <span style="font-size:.72rem;color:var(--text-3);" id="histPageInfo"></span>
+          <div style="display:flex;gap:4px;" id="histPager"></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script src="../shared/utils.js"></script>
+<script src="operations.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  injectSidebar('history');
+  injectTopbar('Move History');
+  renderHistoryTable();
+
+  ['histSearch','histTypeFil','histLocFil'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', () => { histPage = 1; renderHistoryTable(); });
+    document.getElementById(id)?.addEventListener('change', () => { histPage = 1; renderHistoryTable(); });
+  });
+});
+
+function applyHistFilters() { histPage = 1; renderHistoryTable(); }
+function clearHistFilters() {
+  ['histSearch','histTypeFil','histLocFil','histDateFrom','histDateTo'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = el.tagName === 'SELECT' ? 'all' : '';
+  });
+  histPage = 1;
+  renderHistoryTable();
+}
+function exportHistory() {
+  if (typeof HISTORY_DATA === 'undefined' || !HISTORY_DATA.length) return showToast('No history to export', 'warn');
+  const headers = ['Date', 'Reference', 'Type', 'Product', 'Quantity Change', 'Location', 'User'];
+  const rows = HISTORY_DATA.map(h => [h.date, h.ref, h.type, `"${h.product}"`, h.qty, `"${h.loc}"`, `"${h.user}"`]);
+  const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'move_history_export.csv');
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  showToast('History exported successfully', 'success');
+}
+</script>
+</body>
+</html>

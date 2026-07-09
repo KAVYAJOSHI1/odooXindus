@@ -1,0 +1,67 @@
+/* ShelfControl — settings/settings.css */
+
+.settings-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 18px;
+  background: var(--surface-3);
+  border-radius: var(--r-sm);
+  padding: 3px;
+  border: 1px solid var(--border);
+  width: fit-content;
+}
+.settings-tab {
+  background: none;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 5px;
+  font-size: .82rem;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.settings-tab.active {
+  background: var(--surface);
+  color: var(--teal);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Warehouse cards grid */
+.wh-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+.wh-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  animation: fadeUp .3s ease both;
+}
+.wh-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.wh-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+.wh-card-icon {
+  width: 40px; height: 40px;
+  background: var(--teal-light);
+  border-radius: 9px;
+  display: grid; place-items: center;
+  color: var(--teal);
+}
+.wh-card-icon svg { width: 20px; height: 20px; }
+.wh-card-actions { display: flex; gap: 4px; }
+.wh-name { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 800; color: var(--text); margin-bottom: 2px; letter-spacing: -.01em; }
+.wh-code { font-family: 'DM Mono', monospace; font-size: .7rem; color: var(--teal); }
+.wh-stats { display: flex; gap: 12px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.wh-stat { display: flex; flex-direction: column; gap: 2px; }
+.wh-stat-val { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; color: var(--text); }
+.wh-stat-lbl { font-size: .65rem; color: var(--text-3); text-transform: uppercase; letter-spacing: .04em; }
+.wh-address { font-size: .75rem; color: var(--text-2); margin-top: 8px; }
+.wh-manager { font-size: .72rem; color: var(--text-3); margin-top: 4px; }
+
+@media (max-width: 640px) {
+  .wh-grid { grid-template-columns: 1fr; }
+}

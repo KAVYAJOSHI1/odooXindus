@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reset Password — ShelfControl</title>
+  <link rel="stylesheet" href="auth.css"/>
+</head>
+<body>
+  <div class="auth-left">
+    <div class="auth-brand">
+      <div class="auth-brand-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <rect x="2" y="2" width="9" height="9" rx="1.5" fill="currentColor"/>
+          <rect x="13" y="2" width="9" height="9" rx="1.5" fill="currentColor" opacity=".5"/>
+          <rect x="2" y="13" width="9" height="9" rx="1.5" fill="currentColor" opacity=".5"/>
+          <rect x="13" y="13" width="9" height="9" rx="1.5" fill="currentColor"/>
+        </svg>
+      </div>
+      <span class="auth-brand-name">ShelfControl</span>
+    </div>
+
+    <div class="auth-form">
+
+      <!-- Step indicators -->
+      <div class="step-indicator">
+        <div class="step done" id="step1Ind"></div>
+        <div class="step" id="step2Ind"></div>
+        <div class="step" id="step3Ind"></div>
+      </div>
+
+      <!-- STEP 1: Email -->
+      <div id="step1">
+        <h1 class="auth-title">Reset password</h1>
+        <p class="auth-sub">Enter your email and we'll send a 6-digit OTP</p>
+
+        <div class="form-alert error" id="step1Error"></div>
+
+        <div class="form-group">
+          <label class="form-label">Email address</label>
+          <input type="email" class="form-control" id="resetEmail" placeholder="you@company.com"/>
+        </div>
+
+        <button class="btn-auth" onclick="sendOTP()">Send OTP</button>
+        <div class="auth-link"><a href="login.html">← Back to login</a></div>
+      </div>
+
+      <!-- STEP 2: OTP -->
+      <div id="step2" style="display:none;">
+        <h1 class="auth-title">Enter OTP</h1>
+        <p class="auth-sub">We sent a 6-digit code to <strong id="otpEmailDisplay"></strong></p>
+
+        <div class="form-alert error" id="step2Error"></div>
+
+        <div class="otp-grid" id="otpGrid">
+          <input class="otp-input" type="text" maxlength="1" inputmode="numeric"/>
+          <input class="otp-input" type="text" maxlength="1" inputmode="numeric"/>
+          <input class="otp-input" type="text" maxlength="1" inputmode="numeric"/>
+          <input class="otp-input" type="text" maxlength="1" inputmode="numeric"/>
+          <input class="otp-input" type="text" maxlength="1" inputmode="numeric"/>
+          <input class="otp-input" type="text" maxlength="1" inputmode="numeric"/>
+        </div>
+
+        <div style="text-align:center;margin-bottom:16px;">
+          <button class="btn-auth" style="width:auto;padding:0 28px;" onclick="verifyOTP()">Verify OTP</button>
+        </div>
+        <div class="auth-link">
+          Didn't get it? <a href="#" onclick="resendOTP()">Resend OTP</a>
+          <span id="resendTimer" style="color:#94a3b8;font-size:.75rem;"></span>
+        </div>
+      </div>
+
+      <!-- STEP 3: New Password -->
+      <div id="step3" style="display:none;">
+        <h1 class="auth-title">New password</h1>
+        <p class="auth-sub">Choose a strong password for your account</p>
+
+        <div class="form-alert error" id="step3Error"></div>
+
+        <div class="form-group">
+          <label class="form-label">New Password</label>
+          <div class="input-wrap">
+            <input type="password" class="form-control" id="newPassword" placeholder="Min. 8 characters"/>
+            <button type="button" class="input-toggle" onclick="togglePwd('newPassword',this)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm New Password</label>
+          <div class="input-wrap">
+            <input type="password" class="form-control" id="confirmNewPassword" placeholder="Repeat password"/>
+            <button type="button" class="input-toggle" onclick="togglePwd('confirmNewPassword',this)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <button class="btn-auth" onclick="resetPassword()">Reset Password</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-right-inner">
+      <h2>Account security<br/>you can trust.</h2>
+      <p>OTP-based password reset keeps your inventory data safe. No magic links, no guesswork.</p>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+</body>
+</html>
